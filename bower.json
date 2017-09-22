@@ -1,0 +1,44 @@
+{
+    "name": "liquicode_membership",
+    "version": "0.0.2",
+    "homepage": "https://github.com/agbowlin/liquicode_membership",
+    "description": "A NodeJS library providing rudimentary membership services (e.g. Signup, Login, GetData, PutData).",
+    "authors": [
+        {
+            "name": "Andre G. Bowlin",
+            "email": "agbowlin@gmail.com",
+            "homepage": "http://liquicode.com"
+        }
+    ],
+    "private": true,
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/agbowlin/liquicode_membership.git"
+    },
+    "license": "MIT",
+    "keywords": [
+        "nodejs",
+        "socket.io",
+        "angularjs"
+    ],
+    "files": [
+        "package.json",
+        "bower.json",
+        "LICENSE",
+        "VERSION",
+        "README.md",
+        "Membership.js",
+        "MembershipClient.js"
+    ],
+    "ignore": [
+        ".*",
+        "bower_components",
+        "node_modules",
+        "build",
+        "out",
+        "test"
+    ],
+    "moduleType": [
+        "globals"
+    ]
+}
