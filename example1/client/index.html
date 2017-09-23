@@ -24,7 +24,7 @@
 			display: none !important;
 		}
 	</style>
-	
+
 </head>
 
 <body ng-app="TheApplication">
@@ -58,24 +58,24 @@
 
 				<!--Show when the user IS NOT logged in-->
 				<div ng-hide="Member.member_logged_in" ng-cloak>
-					
+
 					<p class="bg-warning">
 						You are currently logged out
 					</p>
-					
+
 					<button class="btn btn-default" type="button" ng-click="show_member_login_modal()">
 						Login
 					</button>
-					
+
 				</div>
 
 				<!--Show when the user IS logged in-->
 				<div ng-hide="!Member.member_logged_in" ng-cloak>
-					
+
 					<p class="bg-success">
 						You are currently logged in as [{{ Member.member_name }}]
 					</p>
-					
+
 					<table class="table">
 						<tr>
 							<th>Signup Time</th>
@@ -98,7 +98,7 @@
 					<button class="btn btn-default" type="button" ng-cloak ng-click="Member.MemberLogout()">
 						Logout
 					</button>
-					
+
 				</div>
 
 			</div>
@@ -117,7 +117,7 @@
 		-->
 
 		<div id="member_login_modal" class="modal fade" role="dialog">
-			<div class="modal-dialog modal-lg">
+			<div class="modal-dialog modal-md">
 
 				<div class="modal-content">
 
@@ -128,33 +128,46 @@
 
 					<div class="modal-body">
 
-						<div class="form-group">
-							<label class="" for="member_name">Member Name</label>
-							<input class="form-control" ng-model="Member.member_name" id="ui_member_name" type="text">
-						</div>
-
-						<div class="form-group">
-							<label class="" for="member_email">Email Address</label>
-							<input class="form-control" ng-model="Member.member_email" id="ui_member_email" type="text">
-						</div>
-
-						<div class="form-group">
-							<label class="" for="member_password">Password</label>
-							<input class="form-control" ng-model="Member.member_password" id="ui_member_password" type="password">
-						</div>
-
-						<div class="form-group">
-							<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberLogin()">
-								Login
-							</button>
-						</div>
+						<table>
+							<tr>
+								<td>
+									<label class="" for="member_name">Member Name</label>
+								</td>
+								<td>
+									<input class="form-control" ng-model="Member.member_name" id="ui_member_name" type="text">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label class="" for="member_password">Password</label>
+								</td>
+								<td>
+									<form class="form-inline">
+										<input class="form-control" ng-model="Member.member_password" id="ui_member_password" type="password">
+										<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberLogin()">
+											Login
+										</button>
+									</form>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label class="" for="member_email">Email Address</label>
+								</td>
+								<td>
+									<form class="form-inline">
+										<input class="form-control" ng-model="Member.member_email" id="ui_member_email" type="text">
+										<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberSignup()">
+											Signup
+										</button>
+									</form>
+								</td>
+							</tr>
+						</table>
 
 					</div>
 
 					<div class="modal-footer">
-						<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberSignup()">
-							Signup
-						</button>
 						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 					</div>
 
