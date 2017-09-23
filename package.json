@@ -1,6 +1,6 @@
 {
     "name": "liquicode_membership",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "homepage": "https://github.com/agbowlin/liquicode_membership",
     "description": "A NodeJS library providing rudimentary membership services (e.g. Signup, Login, GetData, PutData).",
     "authors": [
@@ -14,6 +14,7 @@
         "type": "git",
         "url": "git://github.com/agbowlin/liquicode_membership.git"
     },
+    "main": "Membership.js",
     "license": "MIT",
     "keywords": [
         "nodejs",

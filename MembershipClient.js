@@ -6,68 +6,68 @@
 // module.exports = MembershipClient;
 
 
-function MembershipClient() {
+function MembershipClient()
+{
 	return;
 }
 
 
 //---------------------------------------------------------------------
-MembershipClient.WireMembership =
-	function WireMembership(ScopeName, $scope, socket, $cookies) {
+MembershipClient.GetMember =
+	function GetMember(ScopeName, socket, $cookies)
+	{
 
+		var Member = {};
 
 		//=====================================================================
 		//	Initialize
 		//=====================================================================
 
-		//==========================================
-		$scope.MembershipClientInitialize = function MembershipClientInitialize() {
-			$scope.member_logged_in = $cookies.get(ScopeName + '.member_logged_in');
-			if ($scope.member_logged_in == undefined) { $scope.member_logged_in = false }
-			$scope.member_name = $cookies.get(ScopeName + '.member_name');
-			$scope.member_email = $cookies.get(ScopeName + '.member_email');
-			$scope.member_data = null;
-			if ($scope.member_name && $scope.member_logged_in) {
-				// Retrieve the member data from the server.
-				$scope.GetMemberData();
-			}
-			return;
-		};
+		Member.member_logged_in = $cookies.get(ScopeName + '.member_logged_in') || false;
+		Member.member_name = $cookies.get(ScopeName + '.member_name') || '';
+		// Member.member_email = $cookies.get(ScopeName + '.member_email') || '';
+		Member.session_id = $cookies.get(ScopeName + '.session_id') || '';
+		Member.member_password = '';
+		Member.member_data = null;
+		Member.status_message = '';
 
 		//=====================================================================
 		//	Member Signup
 		//=====================================================================
 
 		//==========================================
-		$scope.MemberSignup = function MemberSignup(MemberName, MemberEmail, MemberPassword) {
-			if (!MemberName) {
-				$scope.notice = "No membership credentials provided.";
+		Member.MemberSignup = function MemberSignup()
+		{
+			if (!Member.member_name)
+			{
+				Member.status_message = "No membership credentials provided.";
 				return;
 			}
 
-			$scope.notice = "Generating membership ...";
-			$scope.errors = [];
+			Member.status_message = "Generating membership ...";
 
 			// Authenticate the member with the server.
-			socket.emit('Membership.MemberSignup', MemberName, MemberEmail, MemberPassword);
+			socket.emit('Membership.MemberSignup', Member.member_name, Member.member_email, Member.member_password);
 			return;
 		};
-		socket.on('Membership.MemberSignup_response', function(MemberData) {
-			if (!MemberData) {
-				$scope.notice = "Unable to retrieve membership data.";
-				$scope.$apply();
+		Member.OnMemberSignup = function OnMemberSignup() {};
+		socket.on('Membership.MemberSignup_response', function(SessionID, MemberData)
+		{
+			if (!SessionID)
+			{
+				Member.status_message = "Unable to retrieve membership data.";
+				Member.OnMemberSignup(false);
 				return;
 			}
-			$scope.notice = "Retrieved membership data for [" + MemberData.member_name + "].";
-			$scope.member_logged_in = true;
-			$scope.member_name = MemberData.member_name;
-			$scope.member_email = MemberData.member_email;
-			$scope.member_password = MemberData.member_password;
-			$scope.member_data = MemberData;
-			$cookies.put(ScopeName + '.member_logged_in', true);
-			$cookies.put(ScopeName + '.member_name', $scope.member_name);
-			$cookies.put(ScopeName + '.member_email', $scope.member_email);
-			$scope.$apply();
+			Member.status_message = "Signup succeeded for [" + Member.member_name + "].";
+			Member.member_logged_in = true;
+			Member.session_id = SessionID;
+			Member.member_data = MemberData;
+			$cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
+			$cookies.put(ScopeName + '.member_name', Member.member_name);
+			// $cookies.put(ScopeName + '.member_email', Member.member_email);
+			$cookies.put(ScopeName + '.session_id', Member.session_id);
+			Member.OnMemberSignup(true);
 			return;
 		});
 
@@ -77,48 +77,68 @@ MembershipClient.WireMembership =
 		//=====================================================================
 
 		//==========================================
-		$scope.MemberLogin = function MemberLogin(MemberName, MemberEmail, MemberPassword) {
-			$scope.notice = "Authenticating membership credentials ...";
-			$scope.errors = [];
-			if (!MemberName) {
-				$scope.notice = "No membership credentials provided.";
+		Member.MemberLogin = function MemberLogin()
+		{
+			Member.status_message = "Authenticating membership credentials ...";
+			if (!Member.member_name)
+			{
+				Member.status_message = "No membership credentials provided.";
 				return;
 			}
 
 			// Authenticate the member with the server.
-			socket.emit('Membership.MemberLogin', MemberName, MemberEmail, MemberPassword);
+			socket.emit('Membership.MemberLogin', Member.member_name, Member.member_password);
 			return;
 		};
-		socket.on('Membership.MemberLogin_response', function(MemberData) {
-			if (!MemberData) {
-				$scope.member_logged_in = false;
-				$scope.notice = "Unable to retrieve membership data.";
-				$scope.$apply();
+		Member.OnMemberLogin = function OnMemberLogin(Success) {};
+		socket.on('Membership.MemberLogin_response', function(SessionID, MemberData)
+		{
+			if (!SessionID)
+			{
+				Member.member_logged_in = false;
+				Member.status_message = "Login failed.";
+				Member.OnMemberLogin(false);
 				return;
 			}
-			$scope.notice = "Retrieved membership data for [" + MemberData.member_name + "].";
-			$scope.member_logged_in = true;
-			$scope.member_name = MemberData.member_name;
-			$scope.member_email = MemberData.member_email;
-			$scope.member_data = MemberData;
-			$scope.item_list = null;
-			$cookies.put(ScopeName + '.member_logged_in', true);
-			$cookies.put(ScopeName + '.member_name', $scope.member_name);
-			$cookies.put(ScopeName + '.member_email', $scope.member_email);
-			$scope.$apply();
+			Member.status_message = "Logged in as [" + Member.member_name + "].";
+			Member.member_logged_in = true;
+			Member.session_id = SessionID;
+			Member.member_data = MemberData;
+			$cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
+			$cookies.put(ScopeName + '.member_name', Member.member_name);
+			// $cookies.put(ScopeName + '.member_email', Member.member_email);
+			$cookies.put(ScopeName + '.session_id', Member.session_id);
+			Member.OnMemberLogin(true);
 			return;
 		});
 
 
 		//==========================================
-		$scope.MemberLogout = function MemberLogout() {
-			$scope.notice = "Logging out ...";
-			$cookies.remove(ScopeName + '.member_logged_in');
-			$scope.member_logged_in = false;
-			$scope.member_data = null;
-			$scope.member_password = null;
+		Member.MemberLogout = function MemberLogout()
+		{
+			Member.status_message = "Logging out ...";
+			socket.emit('Membership.MemberLogout', Member.session_id, Member.member_name);
 			return;
 		};
+		Member.OnMemberLogout = function OnMemberLogout(Success) {};
+		socket.on('Membership.MemberLogout_response', function(Success)
+		{
+			if (!Success)
+			{
+				Member.status_message = "Logout failed.";
+				Member.OnMemberLogout(false);
+				return;
+			}
+			Member.status_message = "Logged out [" + Member.member_name + "].";
+			Member.member_logged_in = false;
+			Member.session_id = '';
+			Member.member_password = '';
+			Member.member_data = null;
+			$cookies.remove(ScopeName + '.member_logged_in');
+			$cookies.remove(ScopeName + '.session_id');
+			Member.OnMemberLogout(true);
+			return;
+		});
 
 
 		//=====================================================================
@@ -126,45 +146,51 @@ MembershipClient.WireMembership =
 		//=====================================================================
 
 		//==========================================
-		$scope.GetMemberData = function GetMemberData() {
-			$scope.notice = "Retrieving membership data ...";
-			$scope.errors = [];
-			socket.emit('Membership.GetMemberData', $scope.member_name);
+		Member.GetMemberData = function GetMemberData()
+		{
+			Member.status_message = "Retrieving membership data ...";
+			socket.emit('Membership.GetMemberData', Member.session_id, Member.member_name);
 			return;
 		};
-		socket.on('Membership.GetMemberData_response', function(MemberData) {
-			if (!MemberData) {
-				$scope.notice = "Unable to retrieve membership data.";
-				$scope.$apply();
+		Member.OnGetMemberData = function OnGetMemberData(Success) {};
+		socket.on('Membership.GetMemberData_response', function(MemberData)
+		{
+			if (!MemberData)
+			{
+				Member.status_message = "Unable to retrieve membership data.";
+				Member.OnGetMemberData(false);
 				return;
 			}
-			$scope.notice = "Retrieved membership data for [" + MemberData.member_name + "].";
-			$scope.member_data = MemberData;
-			$scope.$apply();
+			Member.status_message = "Retrieved membership data for [" + Member.member_name + "].";
+			Member.member_data = MemberData;
+			Member.OnGetMemberData(true);
 			return;
 		});
 
 
 		//==========================================
-		$scope.PutMemberData = function PutMemberData() {
-			$scope.notice = "Updating membership data ...";
-			$scope.errors = [];
-			socket.emit('Membership.PutMemberData', $scope.member_data);
+		Member.PutMemberData = function PutMemberData()
+		{
+			Member.status_message = "Updating membership data ...";
+			socket.emit('Membership.PutMemberData', Member.session_id, Member.member_name, Member.member_data);
 			return;
 		};
-		socket.on('Membership.PutMemberData_response', function(Success) {
-			if (!Success) {
-				$scope.notice = "Unable to update membership data.";
-				$scope.$apply();
+		Member.OnPutMemberData = function OnPutMemberData(Success) {};
+		socket.on('Membership.PutMemberData_response', function(Success)
+		{
+			if (!Success)
+			{
+				Member.status_message = "Unable to update membership data.";
+				Member.OnPutMemberData(false);
 				return;
 			}
-			$scope.notice = "Updated membership data for [" + $scope.member_name + "].";
-			$scope.$apply();
+			Member.status_message = "Updated membership data for [" + Member.member_name + "].";
+			Member.OnPutMemberData(true);
 			return;
 		});
 
 
-		return;
+		return Member;
 	};
 
 
@@ -172,13 +198,15 @@ MembershipClient.WireMembership =
 
 //=====================================================================
 // Integrate with the browser environment.
-if (typeof window != 'undefined') {
+if (typeof window != 'undefined')
+{
 	window['MembershipClient'] = MembershipClient;
 }
 
 
 //=====================================================================
 // Integrate with the nodejs environment.
-if (typeof exports != 'undefined') {
+if (typeof exports != 'undefined')
+{
 	exports.MembershipClient = MembershipClient;
 }

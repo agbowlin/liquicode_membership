@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+	<!--
+		==========================================
+			Page Metadata
+		==========================================
+		-->
+
+	<title>Example 1</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+	<style>
+		[ng\:cloak],
+		[ng-cloak],
+		[data-ng-cloak],
+		[x-ng-cloak],
+		.ng-cloak,
+		.x-ng-cloak {
+			display: none !important;
+		}
+	</style>
+	
+</head>
+
+<body ng-app="TheApplication">
+
+	<div class="container" ng-controller="TheController">
+
+
+		<!--
+		==========================================
+		==========================================
+
+			Page Content
+
+		==========================================
+		==========================================
+		-->
+
+
+		<div class="container-fluid">
+
+			<div class="row">
+
+				<h1>liquicode_membership</h1>
+				<h3>Example 1</h3>
+				<p>
+					A simple example to demonstrate the usage of liquicode_membership module for a NodeJS/SocketIO/Angular stack.
+				</p>
+
+			</div>
+			<div class="row">
+
+				<!--Show when the user IS NOT logged in-->
+				<div ng-hide="Member.member_logged_in" ng-cloak>
+					
+					<p class="bg-warning">
+						You are currently logged out
+					</p>
+					
+					<button class="btn btn-default" type="button" ng-click="show_member_login_modal()">
+						Login
+					</button>
+					
+				</div>
+
+				<!--Show when the user IS logged in-->
+				<div ng-hide="!Member.member_logged_in" ng-cloak>
+					
+					<p class="bg-success">
+						You are currently logged in as [{{ Member.member_name }}]
+					</p>
+					
+					<table class="table">
+						<tr>
+							<th>Signup Time</th>
+							<td>{{ Member.member_data.signup_time }}</td>
+						</tr>
+						<tr>
+							<th>Login Time</th>
+							<td>{{ Member.member_data.login_time }}</td>
+						</tr>
+						<tr>
+							<th>Member Name</th>
+							<td>{{ Member.member_name }}</td>
+						</tr>
+						<tr>
+							<th>Email Address</th>
+							<td>{{ Member.member_email }}</td>
+						</tr>
+					</table>
+
+					<button class="btn btn-default" type="button" ng-cloak ng-click="Member.MemberLogout()">
+						Logout
+					</button>
+					
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<!--
+		==========================================
+		==========================================
+
+			Member Login Window
+
+		==========================================
+		==========================================
+		-->
+
+		<div id="member_login_modal" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+
+				<div class="modal-content">
+
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h2 class="modal-title">Member Login</h2>
+					</div>
+
+					<div class="modal-body">
+
+						<div class="form-group">
+							<label class="" for="member_name">Member Name</label>
+							<input class="form-control" ng-model="Member.member_name" id="ui_member_name" type="text">
+						</div>
+
+						<div class="form-group">
+							<label class="" for="member_email">Email Address</label>
+							<input class="form-control" ng-model="Member.member_email" id="ui_member_email" type="text">
+						</div>
+
+						<div class="form-group">
+							<label class="" for="member_password">Password</label>
+							<input class="form-control" ng-model="Member.member_password" id="ui_member_password" type="password">
+						</div>
+
+						<div class="form-group">
+							<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberLogin()">
+								Login
+							</button>
+						</div>
+
+					</div>
+
+					<div class="modal-footer">
+						<button class="btn btn-default" type="button" data-dismiss="modal" ng-click="Member.MemberSignup()">
+							Signup
+						</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+
+		<!--
+		==========================================
+			Page Errors
+		==========================================
+		-->
+
+		<div class="container-fluid">
+			<div class="row">
+				<hr ng-cloak>
+				<h5 ng-cloak>{{ Member.status_message }}</h5>
+				<ul ng-cloak>
+					<li ng-repeat="error in errors" ng-bind="error">
+					</li>
+				</ul>
+				<!--<hr ng-cloak>-->
+			</div>
+		</div>
+
+
+	</div>
+
+</body>
+
+<!--
+		==========================================
+			Javascript Library Includes
+		==========================================
+		-->
+
+<script src="/node_modules/socket.io-client/dist/socket.io.js"></script>
+<script src="/node_modules/liquicode_membership/MembershipClient.js"></script>
+<!--<script src="./MembershipClient.js"></script>-->
+
+<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/bower_components/angular/angular.min.js"></script>
+<script src="/bower_components/angular-cookies/angular-cookies.min.js"></script>
+
+<script src="/index.js"></script>
+
+
+<script>
+	/* global $ */
+	/* global app */
+
+	// Add modal window activator functions.
+	app.run(function($rootScope)
+	{
+
+		//==========================================
+		$rootScope.show_member_login_modal = function show_member_login_modal()
+		{
+			$('#member_login_modal').modal('show');
+			return;
+		};
+
+	});
+</script>
+
+</html>

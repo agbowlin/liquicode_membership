@@ -1,0 +1,10 @@
+{
+	"name": "liquicode_membership-example-1",
+	"dependencies":
+	{
+		"express": "",
+		"socket.io": "",
+		"sanitize-filename": "",
+		"liquicode_membership": ""
+	}
+}

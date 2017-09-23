@@ -1,0 +1,10 @@
+{
+	"name": "liquicode_membership-example-1",
+	"dependencies":
+	{
+		"jquery": "",
+		"bootstrap": "",
+		"angular": "",
+		"angular-cookies": ""
+	}
+}
