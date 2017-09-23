@@ -1,6 +1,6 @@
 {
     "name": "liquicode_membership",
-    "version": "0.0.11",
+    "version": "0.0.12",
     "homepage": "https://github.com/agbowlin/liquicode_membership",
     "description": "A NodeJS library providing rudimentary membership services (e.g. Signup, Login, GetData, PutData).",
     "authors": [
