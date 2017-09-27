@@ -59,7 +59,7 @@
 				<!--Show when the user IS NOT logged in-->
 				<div ng-hide="Member.member_logged_in" ng-cloak>
 
-					<p class="bg-warning">
+					<p class="bg-danger">
 						You are currently logged out
 					</p>
 
@@ -98,6 +98,14 @@
 					<button class="btn btn-default" type="button" ng-cloak ng-click="Member.MemberLogout()">
 						Logout
 					</button>
+
+					<div>
+						<br>
+						<p>Path = {{ current_path }}</p>
+						<ul>
+							<li ng-repeat="item in path_list">{{ item }}</li>
+						</ul>
+					</div>
 
 				</div>
 

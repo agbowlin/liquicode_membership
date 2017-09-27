@@ -66,12 +66,10 @@ Instantiate and configure the Membership module.
 var socket = io.connect();
 var cookies = SomeBrowserCookiesImplementation();
 
-/* global MembershipClient */
+// Initialize the Membership object.
 var Member = MembershipClient.GetMember('MyExampleApp', socket, cookies);
-Member.OnMemberLogin = function(Success)
-{
-	console.log('OnMemberLogin returned ' + Success);
-};
+// Member will be preloaded with any membership info from browser cookies.
+// i.e. Member.member_logged_in, Member.member_name, Member.session_id
 ```
 
 Manipulate the Membership object to authenticate and use the Membership service.
@@ -79,10 +77,14 @@ Manipulate the Membership object to authenticate and use the Membership service.
 Member.member_name = 'john';
 Member.member_password = 'john-password';
 Member.MemberLogin();
+Member.OnMemberLogin = function(Success)
+{
+	console.log('OnMemberLogin returned ' + Success + ' for ' + Member.member_name);
+};
 ```
 
 
-Membership API
+Membership Client API
 ------------------------------------------
 
 - `MemberSignup(MemberName, MemberEmail, MemberPassword)` :
@@ -111,6 +113,25 @@ Membership API
 	- `SessionID` (required) : An active session id obtained from `MemberSignup` or `MemberLogin`.
 	- `MemberName` (required) : The name of the member.
 	- `MemberData` (required) : The new member data object to store.
+
+
+- `PathList(Path, Recurse)` :
+	Lists all folders and files found under `Path`.
+	Folder names will always end with a `/`.
+- `PathRead(Path)` :
+	Reads content from the file specified by `Path` and returns it.
+- `PathWrite(Path, Content)` :
+	Write `Content` to the file specified by `Path`.
+	`Path` is created if it does not exist.
+- `PathMake(Path)` :
+	Creates a new path.
+	Creates any required parent folders.
+- `PathClean(Path)` :
+	Removes all files and subfolders from a folder.
+	Does not delete the folder itself.
+- `PathDelete(Path)` :
+	Deletes the file or folder specified by `Path`.
+	If `Path` is a folder, then it will be cleaned first.
 
 
 ### Working with the Membership Client

@@ -1,4 +1,5 @@
 *.log
+node_modules/
 example1/server/node_modules
 example1/client/bower_components
 example1/client/node_modules
