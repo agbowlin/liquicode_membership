@@ -37,11 +37,36 @@ Membership.ApplicationName = 'default';
 
 
 //---------------------------------------------------------------------
+var ERR_IllegalPathAccess = {
+	message: "Illegal path access."
+};
+
+var ERR_CannotRemoveRootFolder = {
+	message: "Cannot remove root folder."
+};
+
+
+//---------------------------------------------------------------------
+function get_member_path(MemberName) {
+	var name = npm_sanitize(MemberName.toLowerCase());
+	var path = npm_path.join(Membership.RootFolder, name);
+	return path;
+}
+
+
+//---------------------------------------------------------------------
+function get_member_application_path(MemberName, ApplicationName) {
+	var name = npm_sanitize(ApplicationName.toLowerCase());
+	var path = npm_path.join(get_member_path(MemberName), name);
+	return path;
+}
+
+
+//---------------------------------------------------------------------
 Membership.GetMemberObject =
 	function GetMemberObject(MemberName) {
 		// Get the Member Object filename.
-		var filename = npm_sanitize(MemberName);
-		filename = npm_path.join(Membership.RootFolder, filename);
+		var filename = get_member_path(MemberName);
 		filename = npm_path.join(filename, 'member.json');
 		if (!npm_fs.existsSync(filename)) {
 			return null;
@@ -56,11 +81,11 @@ Membership.GetMemberObject =
 Membership.PutMemberObject =
 	function PutMemberObject(MemberName, Member) {
 		// Get the Member Object filename.
-		var filename = npm_sanitize(MemberName);
-		filename = npm_path.join(Membership.RootFolder, filename);
-		filename = npm_path.join(filename, 'member.json');
+		var filename = get_member_path(MemberName);
+		npm_fs_extra.ensureDirSync(filename);
 		// Write the Member Object.
-		npm_fs.writeFileSync(filename, JSON.stringify(Member, null, 4));
+		filename = npm_path.join(filename, 'member.json');
+		npm_fs_extra.outputFileSync(filename, JSON.stringify(Member, null, 4));
 		return;
 	};
 
@@ -69,8 +94,7 @@ Membership.PutMemberObject =
 Membership.GetMemberDataObject =
 	function GetMemberDataObject(MemberName) {
 		// Get the Member Data Object filename.
-		var filename = npm_sanitize(MemberName);
-		filename = npm_path.join(Membership.RootFolder, filename);
+		var filename = get_member_path(MemberName);
 		filename = npm_path.join(filename, 'member-data.json');
 		if (!npm_fs.existsSync(filename)) {
 			return null;
@@ -85,24 +109,11 @@ Membership.GetMemberDataObject =
 Membership.PutMemberDataObject =
 	function PutMemberDataObject(MemberName, MemberData) {
 		// Get the Member Data Object filename.
-		var filename = npm_sanitize(MemberName);
-		filename = npm_path.join(Membership.RootFolder, filename);
+		var filename = get_member_path(MemberName);
 		filename = npm_path.join(filename, 'member-data.json');
 		// Write the Member Data Object.
-		npm_fs.writeFileSync(filename, JSON.stringify(MemberData, null, 4));
+		npm_fs_extra.outputFileSync(filename, JSON.stringify(MemberData, null, 4));
 		return true;
-	};
-
-
-//---------------------------------------------------------------------
-Membership.GetMemberApplicationPath =
-	function GetMemberApplicationPath(MemberName, ApplicationName) {
-		var member_name = npm_sanitize(MemberName);
-		var application_name = npm_sanitize(ApplicationName);
-		var folder_path = Membership.RootFolder;
-		folder_path = npm_path.join(folder_path, member_name);
-		folder_path = npm_path.join(folder_path, application_name);
-		return folder_path;
 	};
 
 
@@ -268,9 +279,9 @@ Membership.MemberLogout =
 //---------------------------------------------------------------------
 Membership.PathList =
 	function PathList(MemberName, ApplicationName, Path, Recurse) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_root = npm_path.join(app_path, Path);
-		if (item_root.indexOf(app_path) != 0) { throw "Illegal path access."; }
+		if (item_root.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		var items = [];
 		if (npm_fs.existsSync(item_root)) {
 			if (Recurse) {
@@ -306,9 +317,9 @@ Membership.PathList =
 //---------------------------------------------------------------------
 Membership.PathRead =
 	function PathRead(MemberName, ApplicationName, Path) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
-		if (item_path.indexOf(app_path) != 0) { throw "Illegal path access."; }
+		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		var content = npm_fs.readFileSync(item_path);
 		return {
 			"path": Path,
@@ -320,10 +331,10 @@ Membership.PathRead =
 //---------------------------------------------------------------------
 Membership.PathWrite =
 	function PathWrite(MemberName, ApplicationName, Path, Content) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
-		if (item_path.indexOf(app_path) != 0) { throw "Illegal path access."; }
-		npm_fs.writeFileSync(item_path, Content);
+		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
+		npm_fs_extra.outputFileSync(item_path, Content);
 		return {
 			"path": Path,
 			"sucess": true
@@ -334,9 +345,9 @@ Membership.PathWrite =
 //---------------------------------------------------------------------
 Membership.PathMake =
 	function PathClean(MemberName, ApplicationName, Path) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
-		if (item_path.indexOf(app_path) != 0) { throw "Illegal path access."; }
+		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		npm_fs_extra.ensureDirSync(item_path);
 		return {
 			"path": Path,
@@ -348,9 +359,9 @@ Membership.PathMake =
 //---------------------------------------------------------------------
 Membership.PathClean =
 	function PathClean(MemberName, ApplicationName, Path) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
-		if (item_path.indexOf(app_path) != 0) { throw "Illegal path access."; }
+		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		npm_fs_extra.emptyDirSync(item_path);
 		return {
 			"path": Path,
@@ -362,10 +373,10 @@ Membership.PathClean =
 //---------------------------------------------------------------------
 Membership.PathDelete =
 	function PathDelete(MemberName, ApplicationName, Path) {
-		var app_path = Membership.GetMemberApplicationPath(MemberName, ApplicationName, '');
+		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
-		if (item_path.indexOf(app_path) != 0) { throw "Illegal path access."; }
-		if ((app_path == item_path) || (app_path == (item_path + '/'))) { throw "Cannot remove root folder."; }
+		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
+		if ((app_path == item_path) || (app_path == (item_path + '/'))) { throw ERR_CannotRemoveRootFolder; }
 		npm_fs_extra.removeSync(item_path);
 		return {
 			"path": Path,
