@@ -2,13 +2,24 @@
 
 var npm_path = require('path');
 var npm_fs = require('fs');
-var npm_exec = require('child_process').exec;
+// var npm_exec = require('child_process').exec;
+
+// For generating session ids and hashing passwords.
 var npm_crypto = require('crypto');
+var PASSWORDS_USE_SALTED_HASH = true;
 
 // var npm_string = require('string');
+
+// For creating a folder name from a user name.
 var npm_sanitize = require('sanitize-filename');
+
+// For some filesystem functions.
 var npm_fs_extra = require('fs-extra');
+
+// For filesystem search functions.
 var npm_klaw_sync = require('klaw-sync');
+
+// For password hashing.
 
 
 
@@ -96,6 +107,37 @@ Membership.GetMemberApplicationPath =
 
 
 //---------------------------------------------------------------------
+// FROM: https://ciphertrick.com/2016/01/18/salt-hash-passwords-using-nodejs-crypto/
+
+/**
+ * generates random string of characters i.e salt
+ * @function
+ * @param {number} length - Length of the random string.
+ */
+var genRandomString = function(length) {
+	return npm_crypto.randomBytes(Math.ceil(length / 2))
+		.toString('hex') /** convert to hexadecimal format */
+		.slice(0, length); /** return required number of characters */
+};
+
+/**
+ * hash password with sha512.
+ * @function
+ * @param {string} password - List of required fields.
+ * @param {string} salt - Data to be validated.
+ */
+var sha512 = function(password, salt) {
+	var hash = npm_crypto.createHmac('sha512', salt); /** Hashing algorithm sha512 */
+	hash.update(password);
+	var value = hash.digest('hex');
+	return {
+		salt: salt,
+		passwordHash: value
+	};
+};
+
+
+//---------------------------------------------------------------------
 Membership.MemberSignup =
 	function MemberSignup(MemberName, MemberEmail, MemberPassword) {
 
@@ -109,7 +151,14 @@ Membership.MemberSignup =
 		member.credentials = {};
 		member.credentials.member_name = MemberName;
 		member.credentials.member_email = MemberEmail;
-		member.credentials.member_password = MemberPassword;
+		if (PASSWORDS_USE_SALTED_HASH) {
+			var passwordData = sha512(MemberPassword, genRandomString(16));
+			member.credentials.member_password_salt = passwordData.salt;
+			member.credentials.member_password_hash = passwordData.passwordHash;
+		}
+		else {
+			member.credentials.member_password = MemberPassword;
+		}
 
 		// Create a new session.
 		member.session = {};
@@ -137,8 +186,16 @@ Membership.MemberLogin =
 		}
 
 		// Authenticate
-		if (MemberPassword != member.credentials.member_password) {
-			return false;
+		if (PASSWORDS_USE_SALTED_HASH) {
+			var passwordData = sha512(MemberPassword, member.credentials.member_password_salt);
+			if (member.credentials.member_password_hash != passwordData.passwordHash) {
+				return false;
+			}
+		}
+		else {
+			if (MemberPassword != member.credentials.member_password) {
+				return false;
+			}
 		}
 
 		// Create a new session.

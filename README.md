@@ -84,6 +84,17 @@ Member.OnMemberLogin = function(Success)
 ```
 
 
+Membership Security
+------------------------------------------
+
+By default, user passwords are stored in json files as salted hashes where each
+user has a unique and random salt.
+
+This functionality ius controlled by an internal flag within `Membership.js`
+called `PASSWORDS_USE_SALTED_HASH`. This is set to `true` within the code.
+Change this setting to `false` if you want to store passwords in plain text.
+
+
 Membership Client API
 ------------------------------------------
 
