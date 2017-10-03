@@ -19,9 +19,6 @@ var npm_fs_extra = require('fs-extra');
 // For filesystem search functions.
 var npm_klaw_sync = require('klaw-sync');
 
-// For password hashing.
-
-
 
 module.exports = Membership;
 
@@ -37,13 +34,15 @@ Membership.ApplicationName = 'default';
 
 
 //---------------------------------------------------------------------
-var ERR_IllegalPathAccess = {
-	message: "Illegal path access."
-};
+var ERR_IllegalPathAccess = new Error("Illegal path access.");
+// var ERR_IllegalPathAccess = {
+// 	message: "Illegal path access."
+// };
 
-var ERR_CannotRemoveRootFolder = {
-	message: "Cannot remove root folder."
-};
+var ERR_CannotRemoveRootFolder = new Error("Cannot remove root folder.");
+// var ERR_CannotRemoveRootFolder = {
+// 	message: "Cannot remove root folder."
+// };
 
 
 //---------------------------------------------------------------------
@@ -320,7 +319,8 @@ Membership.PathRead =
 		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
-		var content = npm_fs.readFileSync(item_path);
+		// var content = npm_fs.readFileSync(item_path);
+		var content = npm_fs_extra.readJsonSync(item_path);
 		return {
 			"path": Path,
 			"content": content
@@ -334,10 +334,11 @@ Membership.PathWrite =
 		var app_path = get_member_application_path(MemberName, ApplicationName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
-		npm_fs_extra.outputFileSync(item_path, Content);
+		// npm_fs_extra.outputFileSync(item_path, Content);
+		npm_fs_extra.writeJsonSync(item_path, Content);
 		return {
 			"path": Path,
-			"sucess": true
+			"success": true
 		};
 	};
 
@@ -351,7 +352,7 @@ Membership.PathMake =
 		npm_fs_extra.ensureDirSync(item_path);
 		return {
 			"path": Path,
-			"sucess": true
+			"success": true
 		};
 	};
 
@@ -365,7 +366,7 @@ Membership.PathClean =
 		npm_fs_extra.emptyDirSync(item_path);
 		return {
 			"path": Path,
-			"sucess": true
+			"success": true
 		};
 	};
 
@@ -380,7 +381,7 @@ Membership.PathDelete =
 		npm_fs_extra.removeSync(item_path);
 		return {
 			"path": Path,
-			"sucess": true
+			"success": true
 		};
 	};
 

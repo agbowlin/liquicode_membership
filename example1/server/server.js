@@ -14,7 +14,7 @@ process.env['DEBUG'] = 'socket.io* node myapp';
 
 // Standard Includes
 var npm_path = require('path');
-var npm_fs = require('fs');
+// var npm_fs = require('fs');
 var npm_http = require('http');
 
 // 3rd Party Includes

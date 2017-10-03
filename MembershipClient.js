@@ -1,7 +1,7 @@
+"use strict";
+
 /* global $ */
 
-
-"use strict";
 
 // module.exports = MembershipClient;
 
@@ -245,7 +245,7 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.PathWrite = function PathWrite(Path, Content) {
 			Member.status_message = "Writing content ...";
-			socket.emit('Membership.PathWrite', Path);
+			socket.emit('Membership.PathWrite', Path, Content);
 			return;
 		};
 		Member.OnPathWrite = function OnPathWrite(Path, Success) {};

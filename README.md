@@ -180,3 +180,10 @@ Membership.MemberLogin();
 ```
 
 
+Dependencies
+------------------------------------------
+
+- sanitize-filename [(http://travis-ci.org/parshap/node-sanitize-filename)](http://travis-ci.org/parshap/node-sanitize-filename)
+- fs-extra [(https://www.npmjs.org/package/fs-extra)](https://www.npmjs.org/package/fs-extra)
+- node-klaw-sync [(https://www.npmjs.com/package/klaw-sync)](https://www.npmjs.com/package/klaw-sync)
+
