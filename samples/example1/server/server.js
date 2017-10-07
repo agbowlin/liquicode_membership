@@ -27,8 +27,8 @@ var npm_socketio = require('socket.io');
 // Include the membership module.
 var Membership = require('liquicode_membership');
 var Membership_SocketIO = require('liquicode_membership/Membership-SocketIO.js');
-// var Membership = require('../../Membership.js');
-// var Membership_SocketIO = require('../../Membership-SocketIO.js');
+// var Membership = require('../../../Membership.js');
+// var Membership_SocketIO = require('../../../Membership-SocketIO.js');
 Membership.RootFolder = npm_path.resolve(__dirname, '../members');
 Membership.ApplicationName = 'Example1';
 
@@ -72,32 +72,28 @@ var HttpSockets = [];
 //=====================================================================
 //	Initialize a socket connection.
 SocketIo.on('connection',
-	function(Socket)
-	{
+	function(Socket) {
 
 		// Register this socket connection.
 		HttpSockets.push(Socket);
 
 		// Socket disconnection.
 		Socket.on('disconnect',
-			function()
-			{
+			function() {
 				HttpSockets.splice(HttpSockets.indexOf(Socket), 1);
 			});
 
 		// Add the membership functions.
-		Membership.WireSocketEvents(Socket, null);
+		Membership_SocketIO.WireSocketEvents(Membership, Socket, null);
 
 	});
 
 
 //=====================================================================
 //	Broadcast a message to all connected sockets.
-function broadcast(event, data)
-{
+function broadcast(event, data) {
 	HttpSockets.forEach(
-		function(socket)
-		{
+		function(socket) {
 			socket.emit(event, data);
 		});
 }
@@ -117,8 +113,7 @@ var NodeJS_Address = process.env.IP || "0.0.0.0";
 var NodeJS_Port = process.env.PORT || 3000;
 
 // Check override settings from command line parameters.
-if (process.argv.length > 2)
-{
+if (process.argv.length > 2) {
 	NodeJS_Port = process.argv[2];
 }
 
@@ -127,10 +122,8 @@ if (process.argv.length > 2)
 // Begin accepting connections.
 HttpServer.listen(
 	NodeJS_Port, NodeJS_Address,
-	function()
-	{
+	function() {
 		var addr = HttpServer.address();
 		console.log("Server listening at", addr.address + ":" + addr.port);
 		console.log('Access application here: ' + addr.address + ":" + addr.port + '/index.html');
 	});
-

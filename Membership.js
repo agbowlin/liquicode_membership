@@ -19,9 +19,6 @@ var npm_fs_extra = require('fs-extra');
 var npm_klaw_sync = require('klaw-sync');
 
 
-module.exports = Membership;
-
-
 function Membership() {
 	return;
 }
@@ -376,3 +373,20 @@ Membership.PathDelete =
 		};
 	};
 
+
+
+//=====================================================================
+// Integrate with the browser environment.
+if (typeof window != 'undefined') {
+	window['Membership'] = Membership;
+}
+
+
+//=====================================================================
+// Integrate with the nodejs environment.
+if (typeof exports != 'undefined') {
+	exports = Membership;
+}
+if (typeof module.exports != 'undefined') {
+	module.exports = Membership;
+}
