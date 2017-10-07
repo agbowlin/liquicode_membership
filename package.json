@@ -1,6 +1,6 @@
 {
     "name": "liquicode_membership",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "homepage": "https://github.com/agbowlin/liquicode_membership",
     "description": "A NodeJS library providing rudimentary membership services (e.g. Signup, Login, GetData, PutData).",
     "authors": [
@@ -22,22 +22,21 @@
         "angularjs"
     ],
     "files": [
-        "package.json",
         "bower.json",
         "LICENSE",
-        "VERSION",
-        "README.md",
+        "Membership-SocketIO.js",
         "Membership.js",
+        "MembershipClient-RSVP.js",
         "MembershipClient.js",
-        "example1/*"
+        "package.json",
+        "README.md",
+        "VERSION",
+        "samples/*"
     ],
     "ignore": [
         ".*",
         "bower_components",
-        "node_modules",
-        "build",
-        "out",
-        "test"
+        "node_modules"
     ],
     "scripts": {
         "test": "mocha test/*-test-*.js -R spec"

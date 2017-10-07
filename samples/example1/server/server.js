@@ -26,7 +26,9 @@ var npm_socketio = require('socket.io');
 
 // Include the membership module.
 var Membership = require('liquicode_membership');
+var Membership_SocketIO = require('liquicode_membership/Membership-SocketIO.js');
 // var Membership = require('../../Membership.js');
+// var Membership_SocketIO = require('../../Membership-SocketIO.js');
 Membership.RootFolder = npm_path.resolve(__dirname, '../members');
 Membership.ApplicationName = 'Example1';
 
