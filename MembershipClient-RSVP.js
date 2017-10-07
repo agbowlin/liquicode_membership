@@ -226,6 +226,11 @@ if (typeof window != 'undefined') {
 
 //=====================================================================
 // Integrate with the nodejs environment.
-if (typeof module.exports != 'undefined') {
-	module.exports = MembershipClientRsvp;
+if (typeof exports != 'undefined') {
+	exports = MembershipClientRsvp;
+}
+if (typeof module != 'undefined') {
+	if (typeof module.exports != 'undefined') {
+		module.exports = MembershipClientRsvp;
+	}
 }

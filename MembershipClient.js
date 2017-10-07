@@ -320,6 +320,11 @@ if (typeof window != 'undefined') {
 
 //=====================================================================
 // Integrate with the nodejs environment.
-if (typeof module.exports != 'undefined') {
-	module.exports = MembershipClient;
+if (typeof exports != 'undefined') {
+	exports = MembershipClient;
+}
+if (typeof module != 'undefined') {
+	if (typeof module.exports != 'undefined') {
+		module.exports = MembershipClient;
+	}
 }

@@ -387,6 +387,8 @@ if (typeof window != 'undefined') {
 if (typeof exports != 'undefined') {
 	exports = Membership;
 }
-if (typeof module.exports != 'undefined') {
-	module.exports = Membership;
+if (typeof module != 'undefined') {
+	if (typeof module.exports != 'undefined') {
+		module.exports = Membership;
+	}
 }

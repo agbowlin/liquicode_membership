@@ -243,6 +243,8 @@ if (typeof window != 'undefined') {
 if (typeof exports != 'undefined') {
 	exports = Membership_SocketIO;
 }
-if (typeof module.exports != 'undefined') {
-	module.exports = Membership_SocketIO;
+if (typeof module != 'undefined') {
+	if (typeof module.exports != 'undefined') {
+		module.exports = Membership_SocketIO;
+	}
 }
