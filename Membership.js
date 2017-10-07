@@ -6,7 +6,6 @@ var npm_fs = require('fs');
 
 // For generating session ids and hashing passwords.
 var npm_crypto = require('crypto');
-var PASSWORDS_USE_SALTED_HASH = true;
 
 // var npm_string = require('string');
 
@@ -29,20 +28,14 @@ function Membership() {
 
 
 //---------------------------------------------------------------------
-Membership.RootFolder = '../members';
+Membership.RootFolder = npm_path.resolve(__dirname, 'members');
 Membership.ApplicationName = 'default';
+Membership.PASSWORDS_USE_SALTED_HASH = true;
 
 
 //---------------------------------------------------------------------
 var ERR_IllegalPathAccess = new Error("Illegal path access.");
-// var ERR_IllegalPathAccess = {
-// 	message: "Illegal path access."
-// };
-
 var ERR_CannotRemoveRootFolder = new Error("Cannot remove root folder.");
-// var ERR_CannotRemoveRootFolder = {
-// 	message: "Cannot remove root folder."
-// };
 
 
 //---------------------------------------------------------------------
@@ -54,39 +47,37 @@ function get_member_path(MemberName) {
 
 
 //---------------------------------------------------------------------
-function get_member_application_path(MemberName, ApplicationName) {
-	var name = npm_sanitize(ApplicationName.toLowerCase());
+function get_member_application_path(MemberName) {
+	var name = npm_sanitize(Membership.ApplicationName.toLowerCase());
 	var path = npm_path.join(get_member_path(MemberName), name);
 	return path;
 }
 
 
 //---------------------------------------------------------------------
-Membership.GetMemberObject =
-	function GetMemberObject(MemberName) {
-		// Get the Member Object filename.
-		var filename = get_member_path(MemberName);
-		filename = npm_path.join(filename, 'member.json');
-		if (!npm_fs.existsSync(filename)) {
-			return null;
-		}
-		// Read the Member Object.
-		var member = JSON.parse(npm_fs.readFileSync(filename));
-		return member;
-	};
+function get_member_object(MemberName) {
+	// Get the Member Object filename.
+	var filename = get_member_path(MemberName);
+	filename = npm_path.join(filename, 'member.json');
+	if (!npm_fs.existsSync(filename)) {
+		return null;
+	}
+	// Read the Member Object.
+	var member = JSON.parse(npm_fs.readFileSync(filename));
+	return member;
+}
 
 
 //---------------------------------------------------------------------
-Membership.PutMemberObject =
-	function PutMemberObject(MemberName, Member) {
-		// Get the Member Object filename.
-		var filename = get_member_path(MemberName);
-		npm_fs_extra.ensureDirSync(filename);
-		// Write the Member Object.
-		filename = npm_path.join(filename, 'member.json');
-		npm_fs_extra.outputFileSync(filename, JSON.stringify(Member, null, 4));
-		return;
-	};
+function put_member_object(MemberName, Member) {
+	// Get the Member Object filename.
+	var filename = get_member_path(MemberName);
+	npm_fs_extra.ensureDirSync(filename);
+	// Write the Member Object.
+	filename = npm_path.join(filename, 'member.json');
+	npm_fs_extra.outputFileSync(filename, JSON.stringify(Member, null, 4));
+	return;
+}
 
 
 //---------------------------------------------------------------------
@@ -152,7 +143,7 @@ Membership.MemberSignup =
 	function MemberSignup(MemberName, MemberEmail, MemberPassword) {
 
 		// Check if member already exists.
-		if (Membership.GetMemberObject(MemberName)) {
+		if (get_member_object(MemberName)) {
 			return false;
 		}
 
@@ -161,7 +152,7 @@ Membership.MemberSignup =
 		member.credentials = {};
 		member.credentials.member_name = MemberName;
 		member.credentials.member_email = MemberEmail;
-		if (PASSWORDS_USE_SALTED_HASH) {
+		if (this.PASSWORDS_USE_SALTED_HASH) {
 			var passwordData = sha512(MemberPassword, genRandomString(16));
 			member.credentials.member_password_salt = passwordData.salt;
 			member.credentials.member_password_hash = passwordData.passwordHash;
@@ -175,7 +166,7 @@ Membership.MemberSignup =
 		member.session.session_id = npm_crypto.randomBytes(16).toString("hex");
 
 		// Write the Member object.
-		Membership.PutMemberObject(MemberName, member);
+		put_member_object(MemberName, member);
 
 		// Return the Member Data object.
 		return {
@@ -190,13 +181,13 @@ Membership.MemberLogin =
 	function MemberLogin(MemberName, MemberPassword) {
 
 		// Read the Member object.
-		var member = Membership.GetMemberObject(MemberName);
+		var member = get_member_object(MemberName);
 		if (!member) {
 			return false;
 		}
 
 		// Authenticate
-		if (PASSWORDS_USE_SALTED_HASH) {
+		if (this.PASSWORDS_USE_SALTED_HASH) {
 			var passwordData = sha512(MemberPassword, member.credentials.member_password_salt);
 			if (member.credentials.member_password_hash != passwordData.passwordHash) {
 				return false;
@@ -213,7 +204,7 @@ Membership.MemberLogin =
 		member.session.session_id = npm_crypto.randomBytes(16).toString("hex");
 
 		// Write the Member object.
-		Membership.PutMemberObject(MemberName, member);
+		put_member_object(MemberName, member);
 
 		// Read the Member data object.
 		var member_data = Membership.GetMemberDataObject(MemberName);
@@ -232,7 +223,7 @@ Membership.MemberReconnect =
 	function MemberReconnect(MemberName, SessionID) {
 
 		// Read the Member object.
-		var member = Membership.GetMemberObject(MemberName);
+		var member = get_member_object(MemberName);
 		if (!member) {
 			return false;
 		}
@@ -259,7 +250,7 @@ Membership.MemberLogout =
 	function MemberLogout(MemberName) {
 
 		// Read the Member object.
-		var member = Membership.GetMemberObject(MemberName);
+		var member = get_member_object(MemberName);
 		if (!member) {
 			return false;
 		}
@@ -268,7 +259,7 @@ Membership.MemberLogout =
 		member.session = {};
 
 		// Write the Member object.
-		Membership.PutMemberObject(MemberName, member);
+		put_member_object(MemberName, member);
 
 		// Return Success
 		return true;
@@ -277,8 +268,8 @@ Membership.MemberLogout =
 
 //---------------------------------------------------------------------
 Membership.PathList =
-	function PathList(MemberName, ApplicationName, Path, Recurse) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathList(MemberName, Path, Recurse) {
+		var app_path = get_member_application_path(MemberName);
 		var item_root = npm_path.join(app_path, Path);
 		if (item_root.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		var items = [];
@@ -315,8 +306,8 @@ Membership.PathList =
 
 //---------------------------------------------------------------------
 Membership.PathRead =
-	function PathRead(MemberName, ApplicationName, Path) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathRead(MemberName, Path) {
+		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		// var content = npm_fs.readFileSync(item_path);
@@ -330,8 +321,8 @@ Membership.PathRead =
 
 //---------------------------------------------------------------------
 Membership.PathWrite =
-	function PathWrite(MemberName, ApplicationName, Path, Content) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathWrite(MemberName, Path, Content) {
+		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		// npm_fs_extra.outputFileSync(item_path, Content);
@@ -345,8 +336,8 @@ Membership.PathWrite =
 
 //---------------------------------------------------------------------
 Membership.PathMake =
-	function PathClean(MemberName, ApplicationName, Path) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathClean(MemberName, Path) {
+		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		npm_fs_extra.ensureDirSync(item_path);
@@ -359,8 +350,8 @@ Membership.PathMake =
 
 //---------------------------------------------------------------------
 Membership.PathClean =
-	function PathClean(MemberName, ApplicationName, Path) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathClean(MemberName, Path) {
+		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		npm_fs_extra.emptyDirSync(item_path);
@@ -373,8 +364,8 @@ Membership.PathClean =
 
 //---------------------------------------------------------------------
 Membership.PathDelete =
-	function PathDelete(MemberName, ApplicationName, Path) {
-		var app_path = get_member_application_path(MemberName, ApplicationName);
+	function PathDelete(MemberName, Path) {
+		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		if ((app_path == item_path) || (app_path == (item_path + '/'))) { throw ERR_CannotRemoveRootFolder; }
@@ -503,7 +494,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathList] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathList(Socket.MemberName, Membership.ApplicationName, Path, Recurse);
+					var result = Membership.PathList(Socket.MemberName, Path, Recurse);
 					Socket.emit('Membership.PathList_response', result.path, result.items);
 				}
 				catch (err) {
@@ -517,7 +508,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathRead] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathRead(Socket.MemberName, Membership.ApplicationName, Path);
+					var result = Membership.PathRead(Socket.MemberName, Path);
 					Socket.emit('Membership.PathRead_response', result.path, result.content);
 				}
 				catch (err) {
@@ -531,7 +522,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathWrite] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathWrite(Socket.MemberName, Membership.ApplicationName, Path, Content);
+					var result = Membership.PathWrite(Socket.MemberName, Path, Content);
 					Socket.emit('Membership.PathWrite_response', result.path, result.success);
 				}
 				catch (err) {
@@ -545,7 +536,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathMake] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathMake(Socket.MemberName, Membership.ApplicationName, Path);
+					var result = Membership.PathMake(Socket.MemberName, Path);
 					Socket.emit('Membership.PathMake_response', result.path, result.success);
 				}
 				catch (err) {
@@ -559,7 +550,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathClean] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathClean(Socket.MemberName, Membership.ApplicationName, Path);
+					var result = Membership.PathClean(Socket.MemberName, Path);
 					Socket.emit('Membership.PathClean_response', result.path, result.success);
 				}
 				catch (err) {
@@ -573,7 +564,7 @@ Membership.WireSocketEvents =
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathDelete] ... '); }
 					if (!Socket.MemberName) { throw 'Authentication required.'; }
-					var result = Membership.PathDelete(Socket.MemberName, Membership.ApplicationName, Path);
+					var result = Membership.PathDelete(Socket.MemberName, Path);
 					Socket.emit('Membership.PathDelete_response', result.path, result.success);
 				}
 				catch (err) {

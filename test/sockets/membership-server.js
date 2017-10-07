@@ -1,31 +1,36 @@
 //=====================================================================
 //=====================================================================
-//
-//		server.js
-//
-//	A simple example of how to use the liquicode_membership module.
-//	Run with: nodejs server.js {port}
+/*
+	membership-server.js
+
+	A simple example of how to use the liquicode_membership module.
+	Used for testing.
+	
+	Run with: nodejs membership-server.js {port}
+*/
 //=====================================================================
 //=====================================================================
 
+"use strict";
 
 // Enable socket.io logging.
-process.env['DEBUG'] = 'socket.io* node myapp';
+// process.env['DEBUG'] = 'socket.io* node myapp';
 
 // Standard Includes
-var npm_path = require('path');
+// var npm_path = require('path');
 // var npm_fs = require('fs');
 var npm_http = require('http');
 
 // 3rd Party Includes
-var npm_express = require('express');
+// var npm_express = require('express');
 var npm_socketio = require('socket.io');
 
 // Include the membership module.
-var Membership = require('liquicode_membership');
-// var Membership = require('../../Membership.js');
-Membership.RootFolder = npm_path.resolve(__dirname, '../members');
-Membership.ApplicationName = 'Example1';
+var Membership = require('../Membership.js');
+Membership.ApplicationName = 'membership-server';
+
+// Include the SocketIO layer of the membership module.
+var MembershipSocketIO = require('../Membership-SocketIO.js');
 
 
 //=====================================================================
@@ -37,15 +42,11 @@ Membership.ApplicationName = 'Example1';
 //=====================================================================
 
 
-// Create an Express router.
-var ExpressRouter = npm_express();
-
-// Define a static route for serving the client application files.
-var ClientFolder = npm_path.resolve(__dirname, '../client');
-ExpressRouter.use(npm_express.static(ClientFolder));
-
-// Create the HTTP server.
-var HttpServer = npm_http.createServer(ExpressRouter);
+var HttpServer = npm_http.createServer(
+	function(req, res) {
+		res.write('membership-server.js');
+		res.end();
+	});
 
 
 //=====================================================================
@@ -67,32 +68,28 @@ var HttpSockets = [];
 //=====================================================================
 //	Initialize a socket connection.
 SocketIo.on('connection',
-	function(Socket)
-	{
+	function(Socket) {
 
 		// Register this socket connection.
 		HttpSockets.push(Socket);
 
 		// Socket disconnection.
 		Socket.on('disconnect',
-			function()
-			{
+			function() {
 				HttpSockets.splice(HttpSockets.indexOf(Socket), 1);
 			});
 
 		// Add the membership functions.
-		Membership.WireSocketEvents(Socket, null);
+		MembershipSocketIO(Membership, Socket, null);
 
 	});
 
 
 //=====================================================================
 //	Broadcast a message to all connected sockets.
-function broadcast(event, data)
-{
+function broadcast(event, data) {
 	HttpSockets.forEach(
-		function(socket)
-		{
+		function(socket) {
 			socket.emit(event, data);
 		});
 }
@@ -108,24 +105,16 @@ function broadcast(event, data)
 
 
 // NodeJS startup settings.
-var NodeJS_Address = process.env.IP || "0.0.0.0";
-var NodeJS_Port = process.env.PORT || 3000;
-
-// Check override settings from command line parameters.
-if (process.argv.length > 2)
-{
-	NodeJS_Port = process.argv[2];
-}
+var NodeJS_Address = "localhost";
+var NodeJS_Port = 3000;
 
 
 //==========================================
 // Begin accepting connections.
 HttpServer.listen(
 	NodeJS_Port, NodeJS_Address,
-	function()
-	{
+	function() {
 		var addr = HttpServer.address();
 		console.log("Server listening at", addr.address + ":" + addr.port);
 		console.log('Access application here: ' + addr.address + ":" + addr.port + '/index.html');
 	});
-

@@ -1,6 +1,7 @@
 *.log
+bower_components/
 node_modules/
-example1/server/node_modules
-example1/client/bower_components
-example1/client/node_modules
-example1/members/*
+samples/*/bower_components
+samples/*/node_modules
+samples/*/members
+test/members

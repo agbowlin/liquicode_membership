@@ -1,4 +1,3 @@
-/* global $ */
 /* global io */
 /* global angular */
 /* global MembershipClient */

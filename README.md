@@ -90,8 +90,9 @@ Membership Security
 By default, user passwords are stored in json files as salted hashes where each
 user has a unique and random salt.
 
-This functionality ius controlled by an internal flag within `Membership.js`
-called `PASSWORDS_USE_SALTED_HASH`. This is set to `true` within the code.
+This functionality is controlled by an internal flag within `Membership.js`
+called `PASSWORDS_USE_SALTED_HASH`.
+This is initially set to `true` within the code.
 Change this setting to `false` if you want to store passwords in plain text.
 
 
@@ -115,6 +116,8 @@ Membership Client API
 - `MemberLogout(SessionID, MemberName)` :
 	Destroys any existing session for the member.
 	Returns `true` if successful.
+
+
 - `GetMemberData(SessionID, MemberName)`
 	Retrieves the member data object for a member.
 	- `SessionID` (required) : An active session id obtained from `MemberSignup` or `MemberLogin`.
@@ -183,7 +186,18 @@ Membership.MemberLogin();
 Dependencies
 ------------------------------------------
 
+## Server: Membership.js
+
+- NodeJS
+- socket.io
 - sanitize-filename [(http://travis-ci.org/parshap/node-sanitize-filename)](http://travis-ci.org/parshap/node-sanitize-filename)
 - fs-extra [(https://www.npmjs.org/package/fs-extra)](https://www.npmjs.org/package/fs-extra)
 - node-klaw-sync [(https://www.npmjs.com/package/klaw-sync)](https://www.npmjs.com/package/klaw-sync)
+
+
+## Client: MembershipClient.js
+
+The Membership client currently relies on AngularJS and its cookies implementation.
+
+
 

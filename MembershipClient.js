@@ -1,10 +1,5 @@
 "use strict";
 
-/* global $ */
-
-
-// module.exports = MembershipClient;
-
 
 function MembershipClient() {
 	return;
@@ -13,7 +8,7 @@ function MembershipClient() {
 
 //---------------------------------------------------------------------
 MembershipClient.GetMember =
-	function GetMember(ScopeName, socket, $cookies, MaxSessionLifetime) {
+	function GetMember(ScopeName, Socket, Cookies, MaxSessionLifetime) {
 
 		var Member = {};
 
@@ -21,12 +16,18 @@ MembershipClient.GetMember =
 		//	Initialize
 		//=====================================================================
 
-		Member.member_logged_in = $cookies.get(ScopeName + '.member_logged_in') || false;
-		Member.member_name = $cookies.get(ScopeName + '.member_name') || '';
-		Member.session_id = $cookies.get(ScopeName + '.session_id') || '';
+		Member.member_logged_in = '';
+		Member.member_name = '';
+		Member.session_id = '';
 		Member.member_password = '';
 		Member.member_data = null;
 		Member.status_message = '';
+
+		if (Cookies) {
+			Member.member_logged_in = Cookies.get(ScopeName + '.member_logged_in') || false;
+			Member.member_name = Cookies.get(ScopeName + '.member_name') || '';
+			Member.session_id = Cookies.get(ScopeName + '.session_id') || '';
+		}
 
 		//=====================================================================
 		//	Member Signup
@@ -42,11 +43,11 @@ MembershipClient.GetMember =
 			Member.status_message = "Generating membership ...";
 
 			// Authenticate the member with the server.
-			socket.emit('Membership.MemberSignup', Member.member_name, Member.member_email, Member.member_password);
+			Socket.emit('Membership.MemberSignup', Member.member_name, Member.member_email, Member.member_password);
 			return;
 		};
-		Member.OnMemberSignup = function OnMemberSignup() {};
-		socket.on('Membership.MemberSignup_response', function(SessionID, MemberData) {
+		Member.OnMemberSignup = function OnMemberSignup(Success) {};
+		Socket.on('Membership.MemberSignup_response', function(SessionID, MemberData) {
 			if (!SessionID) {
 				Member.status_message = "Unable to retrieve membership data.";
 				Member.OnMemberSignup(false);
@@ -56,9 +57,11 @@ MembershipClient.GetMember =
 			Member.member_logged_in = true;
 			Member.session_id = SessionID;
 			Member.member_data = MemberData;
-			$cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
-			$cookies.put(ScopeName + '.member_name', Member.member_name);
-			$cookies.put(ScopeName + '.session_id', Member.session_id);
+			if (Cookies) {
+				Cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
+				Cookies.put(ScopeName + '.member_name', Member.member_name);
+				Cookies.put(ScopeName + '.session_id', Member.session_id);
+			}
 			Member.OnMemberSignup(true);
 			return;
 		});
@@ -77,11 +80,11 @@ MembershipClient.GetMember =
 			}
 
 			// Authenticate the member with the server.
-			socket.emit('Membership.MemberLogin', Member.member_name, Member.member_password);
+			Socket.emit('Membership.MemberLogin', Member.member_name, Member.member_password);
 			return;
 		};
 		Member.OnMemberLogin = function OnMemberLogin(Success) {};
-		socket.on('Membership.MemberLogin_response', function(SessionID, MemberData) {
+		Socket.on('Membership.MemberLogin_response', function(SessionID, MemberData) {
 			if (!SessionID) {
 				Member.member_logged_in = false;
 				Member.status_message = "Login failed.";
@@ -92,9 +95,11 @@ MembershipClient.GetMember =
 			Member.member_logged_in = true;
 			Member.session_id = SessionID;
 			Member.member_data = MemberData;
-			$cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
-			$cookies.put(ScopeName + '.member_name', Member.member_name);
-			$cookies.put(ScopeName + '.session_id', Member.session_id);
+			if (Cookies) {
+				Cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
+				Cookies.put(ScopeName + '.member_name', Member.member_name);
+				Cookies.put(ScopeName + '.session_id', Member.session_id);
+			}
 			Member.OnMemberLogin(true);
 			return;
 		});
@@ -109,11 +114,11 @@ MembershipClient.GetMember =
 			}
 
 			// Authenticate the member with the server.
-			socket.emit('Membership.MemberReconnect', Member.member_name, Member.session_id);
+			Socket.emit('Membership.MemberReconnect', Member.member_name, Member.session_id);
 			return;
 		};
 		Member.OnMemberReconnect = function OnMemberReconnect(Success) {};
-		socket.on('Membership.MemberReconnect_response', function(SessionID, MemberData) {
+		Socket.on('Membership.MemberReconnect_response', function(SessionID, MemberData) {
 			if (!SessionID) {
 				Member.member_logged_in = false;
 				Member.status_message = "Login failed.";
@@ -124,9 +129,11 @@ MembershipClient.GetMember =
 			Member.member_logged_in = true;
 			Member.session_id = SessionID;
 			Member.member_data = MemberData;
-			$cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
-			$cookies.put(ScopeName + '.member_name', Member.member_name);
-			$cookies.put(ScopeName + '.session_id', Member.session_id);
+			if (Cookies) {
+				Cookies.put(ScopeName + '.member_logged_in', Member.member_logged_in);
+				Cookies.put(ScopeName + '.member_name', Member.member_name);
+				Cookies.put(ScopeName + '.session_id', Member.session_id);
+			}
 			Member.OnMemberReconnect(true);
 			return;
 		});
@@ -135,11 +142,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.MemberLogout = function MemberLogout() {
 			Member.status_message = "Logging out ...";
-			socket.emit('Membership.MemberLogout');
+			Socket.emit('Membership.MemberLogout');
 			return;
 		};
 		Member.OnMemberLogout = function OnMemberLogout(Success) {};
-		socket.on('Membership.MemberLogout_response', function(Success) {
+		Socket.on('Membership.MemberLogout_response', function(Success) {
 			if (!Success) {
 				Member.status_message = "Logout failed.";
 				Member.OnMemberLogout(false);
@@ -150,8 +157,10 @@ MembershipClient.GetMember =
 			Member.session_id = '';
 			Member.member_password = '';
 			Member.member_data = null;
-			$cookies.remove(ScopeName + '.member_logged_in');
-			$cookies.remove(ScopeName + '.session_id');
+			if (Cookies) {
+				Cookies.remove(ScopeName + '.member_logged_in');
+				Cookies.remove(ScopeName + '.session_id');
+			}
 			Member.OnMemberLogout(true);
 			return;
 		});
@@ -164,11 +173,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.GetMemberData = function GetMemberData() {
 			Member.status_message = "Retrieving membership data ...";
-			socket.emit('Membership.GetMemberData');
+			Socket.emit('Membership.GetMemberData');
 			return;
 		};
 		Member.OnGetMemberData = function OnGetMemberData(Success) {};
-		socket.on('Membership.GetMemberData_response', function(MemberData) {
+		Socket.on('Membership.GetMemberData_response', function(MemberData) {
 			if (!MemberData) {
 				Member.status_message = "Unable to retrieve membership data.";
 				Member.OnGetMemberData(false);
@@ -184,11 +193,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.PutMemberData = function PutMemberData() {
 			Member.status_message = "Updating membership data ...";
-			socket.emit('Membership.PutMemberData', Member.member_data);
+			Socket.emit('Membership.PutMemberData', Member.member_data);
 			return;
 		};
 		Member.OnPutMemberData = function OnPutMemberData(Success) {};
-		socket.on('Membership.PutMemberData_response', function(Success) {
+		Socket.on('Membership.PutMemberData_response', function(Success) {
 			if (!Success) {
 				Member.status_message = "Unable to update membership data.";
 				Member.OnPutMemberData(false);
@@ -207,11 +216,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.PathList = function PathList(Path, Recurse) {
 			Member.status_message = "Retrieving path listing ...";
-			socket.emit('Membership.PathList', Path, Recurse);
+			Socket.emit('Membership.PathList', Path, Recurse);
 			return;
 		};
 		Member.OnPathList = function OnPathList(Path, Items) {};
-		socket.on('Membership.PathList_response', function(Path, Items) {
+		Socket.on('Membership.PathList_response', function(Path, Items) {
 			if (!Items) {
 				Member.status_message = "Unable to retrieve path listing.";
 				Member.OnPathList(Path, null);
@@ -226,11 +235,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.PathRead = function PathRead(Path) {
 			Member.status_message = "Retrieving path content ...";
-			socket.emit('Membership.PathRead', Path);
+			Socket.emit('Membership.PathRead', Path);
 			return;
 		};
 		Member.OnPathRead = function OnPathRead(Path, Content) {};
-		socket.on('Membership.PathRead_response', function(Path, Content) {
+		Socket.on('Membership.PathRead_response', function(Path, Content) {
 			if (!Content) {
 				Member.status_message = "Unable to retrieve path content.";
 				Member.OnPathRead(Path, null);
@@ -245,11 +254,11 @@ MembershipClient.GetMember =
 		//==========================================
 		Member.PathWrite = function PathWrite(Path, Content) {
 			Member.status_message = "Writing content ...";
-			socket.emit('Membership.PathWrite', Path, Content);
+			Socket.emit('Membership.PathWrite', Path, Content);
 			return;
 		};
 		Member.OnPathWrite = function OnPathWrite(Path, Success) {};
-		socket.on('Membership.PathWrite_response', function(Path, Success) {
+		Socket.on('Membership.PathWrite_response', function(Path, Success) {
 			Member.status_message = "Wrote content for [" + Path + "].";
 			Member.OnPathWrite(Path, Success);
 			return;
@@ -257,13 +266,13 @@ MembershipClient.GetMember =
 
 
 		//==========================================
-		Member.PathMake = function PathMake(Path, Content) {
+		Member.PathMake = function PathMake(Path) {
 			Member.status_message = "Making path ...";
-			socket.emit('Membership.PathMake', Path);
+			Socket.emit('Membership.PathMake', Path);
 			return;
 		};
 		Member.OnPathMake = function OnPathMake(Path, Success) {};
-		socket.on('Membership.PathMake_response', function(Path, Success) {
+		Socket.on('Membership.PathMake_response', function(Path, Success) {
 			Member.status_message = "Makeed path [" + Path + "].";
 			Member.OnPathMake(Path, Success);
 			return;
@@ -271,13 +280,13 @@ MembershipClient.GetMember =
 
 
 		//==========================================
-		Member.PathClean = function PathClean(Path, Content) {
+		Member.PathClean = function PathClean(Path) {
 			Member.status_message = "Cleaning path ...";
-			socket.emit('Membership.PathClean', Path);
+			Socket.emit('Membership.PathClean', Path);
 			return;
 		};
 		Member.OnPathClean = function OnPathClean(Path, Success) {};
-		socket.on('Membership.PathClean_response', function(Path, Success) {
+		Socket.on('Membership.PathClean_response', function(Path, Success) {
 			Member.status_message = "Cleaned path [" + Path + "].";
 			Member.OnPathClean(Path, Success);
 			return;
@@ -285,13 +294,13 @@ MembershipClient.GetMember =
 
 
 		//==========================================
-		Member.PathDelete = function PathDelete(Path, Content) {
+		Member.PathDelete = function PathDelete(Path) {
 			Member.status_message = "Deleting path ...";
-			socket.emit('Membership.PathDelete', Path);
+			Socket.emit('Membership.PathDelete', Path);
 			return;
 		};
 		Member.OnPathDelete = function OnPathDelete(Path, Success) {};
-		socket.on('Membership.PathDelete_response', function(Path, Success) {
+		Socket.on('Membership.PathDelete_response', function(Path, Success) {
 			Member.status_message = "Deleted path [" + Path + "].";
 			Member.OnPathDelete(Path, Success);
 			return;
@@ -300,8 +309,6 @@ MembershipClient.GetMember =
 
 		return Member;
 	};
-
-
 
 
 //=====================================================================
@@ -313,6 +320,6 @@ if (typeof window != 'undefined') {
 
 //=====================================================================
 // Integrate with the nodejs environment.
-if (typeof exports != 'undefined') {
-	exports.MembershipClient = MembershipClient;
+if (typeof module.exports != 'undefined') {
+	module.exports = MembershipClient;
 }
