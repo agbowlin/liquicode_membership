@@ -176,7 +176,7 @@ MembershipClient.GetMember =
 			Socket.emit('Membership.GetMemberData');
 			return;
 		};
-		Member.OnGetMemberData = function OnGetMemberData(Success) {};
+		Member.OnGetMemberData = function OnGetMemberData(MemberData) {};
 		Socket.on('Membership.GetMemberData_response', function(MemberData) {
 			if (!MemberData) {
 				Member.status_message = "Unable to retrieve membership data.";
@@ -185,7 +185,7 @@ MembershipClient.GetMember =
 			}
 			Member.status_message = "Retrieved membership data for [" + Member.member_name + "].";
 			Member.member_data = MemberData;
-			Member.OnGetMemberData(true);
+			Member.OnGetMemberData(MemberData);
 			return;
 		});
 

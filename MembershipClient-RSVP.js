@@ -27,10 +27,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 				function(resolve, reject) {
 					Member.OnMemberSignup = function(Success) {
 						if (Success) {
-							resolve(true, "MemberSignup() succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "MemberSignup() failed.");
+							reject(false);
 						}
 					};
 					Member.MemberSignup();
@@ -44,10 +44,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.MemberLogin();
 					Member.OnMemberLogin = function(Success) {
 						if (Success) {
-							resolve(true, "MemberLogin() succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "MemberLogin() failed.");
+							reject(false);
 						}
 					};
 				}
@@ -60,10 +60,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.MemberReconnect();
 					Member.OnMemberReconnect = function(Success) {
 						if (Success) {
-							resolve(true, "MemberReconnect() succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "MemberReconnect() failed.");
+							reject(false);
 						}
 					};
 				}
@@ -76,10 +76,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.MemberLogout();
 					Member.OnMemberLogout = function(Success) {
 						if (Success) {
-							resolve(true, "MemberLogout() succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "MemberLogout() failed.");
+							reject(false);
 						}
 					};
 				}
@@ -90,12 +90,12 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 			return new RSVP.Promise(
 				function(resolve, reject) {
 					Member.GetMemberData();
-					Member.OnGetMemberData = function(Success) {
-						if (Success) {
-							resolve(true, "GetMemberData() succeeded.");
+					Member.OnGetMemberData = function(MemberData) {
+						if (MemberData) {
+							resolve(MemberData);
 						}
 						else {
-							reject(false, "GetMemberData() failed.");
+							reject(false);
 						}
 					};
 				}
@@ -108,10 +108,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PutMemberData();
 					Member.OnPutMemberData = function(Success) {
 						if (Success) {
-							resolve(true, "PutMemberData() succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "PutMemberData() failed.");
+							reject(false);
 						}
 					};
 				}
@@ -124,10 +124,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathList(Path, Recurse);
 					Member.OnPathList = function(Path, Items) {
 						if (Items) {
-							resolve(true, "PathList( " + Path + " ) succeeded.");
+							resolve(Items);
 						}
 						else {
-							reject(false, "PathList( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
@@ -140,10 +140,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathRead(Path);
 					Member.OnPathRead = function(Path, Content) {
 						if (Content) {
-							resolve(Content, "PathRead( " + Path + " ) succeeded.");
+							resolve(Content);
 						}
 						else {
-							reject(false, "PathRead( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
@@ -156,10 +156,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathWrite(Path, Content);
 					Member.OnPathWrite = function(Path, Success) {
 						if (Success) {
-							resolve(true, "PathWrite( " + Path + " ) succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "PathWrite( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
@@ -172,10 +172,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathMake(Path);
 					Member.OnPathMake = function(Path, Success) {
 						if (Success) {
-							resolve(true, "PathMake( " + Path + " ) succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "PathMake( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
@@ -188,10 +188,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathClean(Path);
 					Member.OnPathClean = function(Path, Success) {
 						if (Success) {
-							resolve(true, "PathClean( " + Path + " ) succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "PathClean( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
@@ -204,10 +204,10 @@ MembershipClientRsvp.WireMembershipWithRsvpPromises =
 					Member.PathDelete(Path);
 					Member.OnPathDelete = function(Path, Success) {
 						if (Success) {
-							resolve(true, "PathDelete( " + Path + " ) succeeded.");
+							resolve(true);
 						}
 						else {
-							reject(false, "PathDelete( " + Path + " ) failed.");
+							reject(false);
 						}
 					};
 				}
