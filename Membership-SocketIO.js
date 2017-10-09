@@ -26,6 +26,10 @@ function Membership_SocketIO() {
 
 
 //---------------------------------------------------------------------
+var ERR_AuthenticationRequired = new Error("Authentication required.");
+
+
+//---------------------------------------------------------------------
 Membership_SocketIO.WireSocketEvents =
 	function WireSocketEvents(Membership, Socket, Logger) {
 
@@ -86,7 +90,7 @@ Membership_SocketIO.WireSocketEvents =
 			function() {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.MemberLogout] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var success = Membership.MemberLogout(Socket.MemberName);
 					if (success) {
 						Socket.MemberName = '';
@@ -108,7 +112,7 @@ Membership_SocketIO.WireSocketEvents =
 			function() {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.GetMemberData] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var member_data = Membership.GetMemberDataObject(Socket.MemberName);
 					Socket.emit('Membership.GetMemberData_response', member_data);
 				}
@@ -122,7 +126,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(MemberData) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PutMemberData] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var success = Membership.PutMemberDataObject(Socket.MemberName, MemberData);
 					Socket.emit('Membership.PutMemberData_response', success);
 				}
@@ -141,7 +145,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path, Recurse) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathList] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathList(Socket.MemberName, Path, Recurse);
 					Socket.emit('Membership.PathList_response', result.path, result.items);
 				}
@@ -155,7 +159,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathRead] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathRead(Socket.MemberName, Path);
 					Socket.emit('Membership.PathRead_response', result.path, result.content);
 				}
@@ -169,7 +173,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path, Content) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathWrite] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathWrite(Socket.MemberName, Path, Content);
 					Socket.emit('Membership.PathWrite_response', result.path, result.success);
 				}
@@ -183,7 +187,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathMake] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathMake(Socket.MemberName, Path);
 					Socket.emit('Membership.PathMake_response', result.path, result.success);
 				}
@@ -197,7 +201,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathClean] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathClean(Socket.MemberName, Path);
 					Socket.emit('Membership.PathClean_response', result.path, result.success);
 				}
@@ -211,7 +215,7 @@ Membership_SocketIO.WireSocketEvents =
 			function(Path) {
 				try {
 					if (Logger) { Logger.LogTrace('Processing [Membership.PathDelete] ... '); }
-					if (!Socket.MemberName) { throw 'Authentication required.'; }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
 					var result = Membership.PathDelete(Socket.MemberName, Path);
 					Socket.emit('Membership.PathDelete_response', result.path, result.success);
 				}
