@@ -308,7 +308,7 @@ Membership.PathRead =
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		// var content = npm_fs.readFileSync(item_path);
-		var content = null;
+		var content = {};
 		if (npm_fs.existsSync(item_path)) {
 			content = npm_fs_extra.readJsonSync(item_path);
 		}
