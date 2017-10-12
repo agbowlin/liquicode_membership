@@ -308,7 +308,10 @@ Membership.PathRead =
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		// var content = npm_fs.readFileSync(item_path);
-		var content = npm_fs_extra.readJsonSync(item_path);
+		var content = null;
+		if (npm_fs.existsSync(item_path)) {
+			content = npm_fs_extra.readJsonSync(item_path);
+		}
 		return {
 			"path": Path,
 			"content": content
@@ -323,7 +326,7 @@ Membership.PathWrite =
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		// npm_fs_extra.outputFileSync(item_path, Content);
-		npm_fs_extra.writeJsonSync(item_path, Content);
+		npm_fs_extra.outputJsonSync(item_path, Content);
 		return {
 			"path": Path,
 			"success": true
@@ -351,7 +354,9 @@ Membership.PathClean =
 		var app_path = get_member_application_path(MemberName);
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
-		npm_fs_extra.emptyDirSync(item_path);
+		if (npm_fs.existsSync(item_path)) {
+			npm_fs_extra.emptyDirSync(item_path);
+		}
 		return {
 			"path": Path,
 			"success": true
@@ -366,7 +371,9 @@ Membership.PathDelete =
 		var item_path = npm_path.join(app_path, Path);
 		if (item_path.indexOf(app_path) != 0) { throw ERR_IllegalPathAccess; }
 		if ((app_path == item_path) || (app_path == (item_path + '/'))) { throw ERR_CannotRemoveRootFolder; }
-		npm_fs_extra.removeSync(item_path);
+		if (npm_fs.existsSync(item_path)) {
+			npm_fs_extra.removeSync(item_path);
+		}
 		return {
 			"path": Path,
 			"success": true
