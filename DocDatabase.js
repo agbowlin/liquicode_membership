@@ -122,7 +122,7 @@ DocDatabase.OnConnection =
 				// Construct the collection name.
 				var collection_name = npm_sanitize(MemberName.toLowerCase());
 				if (Request.collection) {
-					collection_name += '@' + npm_sanitize(Request.collection.toLowerCase());
+					collection_name += '.' + npm_sanitize(Request.collection.toLowerCase());
 				}
 
 				// Report.
