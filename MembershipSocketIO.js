@@ -67,6 +67,7 @@ Membership.OnConnection =
 								transaction_id: Request.control.transaction_id,
 								session_id: result.session_id
 							},
+							member_name: result.member_name,
 							member_data: result.member_data
 						});
 					}
@@ -96,6 +97,7 @@ Membership.OnConnection =
 								transaction_id: Request.control.transaction_id,
 								session_id: result.session_id
 							},
+							member_name: result.member_name,
 							member_data: result.member_data
 						});
 					}
@@ -125,6 +127,7 @@ Membership.OnConnection =
 								transaction_id: Request.control.transaction_id,
 								session_id: result.session_id,
 							},
+							member_name: result.member_name,
 							member_data: result.member_data
 						});
 					}

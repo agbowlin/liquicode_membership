@@ -66,6 +66,7 @@ MembershipClient.OnInitialize =
 
 						Member.member_logged_in = true;
 						Member.session_id = Response.control.session_id;
+						Member.member_name = Response.member_name;
 						Member.member_data = Response.member_data;
 
 						if (Cookies) {
@@ -124,6 +125,7 @@ MembershipClient.OnInitialize =
 
 						Member.member_logged_in = true;
 						Member.session_id = Response.control.session_id;
+						Member.member_name = Response.member_name;
 						Member.member_data = Response.member_data;
 
 						if (Cookies) {
@@ -181,6 +183,7 @@ MembershipClient.OnInitialize =
 
 						Member.member_logged_in = true;
 						Member.session_id = Response.control.session_id;
+						Member.member_name = Response.member_name;
 						Member.member_data = Response.member_data;
 
 						if (Cookies) {
