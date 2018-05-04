@@ -440,6 +440,39 @@ MembershipClient.OnInitialize =
 
 
 		//=====================================================================
+		//	Path Read All
+		//=====================================================================
+
+		//---------------------------------------------------------------------
+		Member.PathReadAll =
+			function PathReadAll(Path, callback) {
+				send_command(
+					true,
+					'Membership.PathReadAll', {
+						path: Path
+					},
+					callback
+				);
+				return;
+			};
+
+
+		//---------------------------------------------------------------------
+		Member.SharedPathReadAll =
+			function SharedPathReadAll(Path, callback) {
+				send_command(
+					true,
+					'Membership.PathReadAll', {
+						use_shared_folder: true,
+						path: Path
+					},
+					callback
+				);
+				return;
+			};
+
+
+		//=====================================================================
 		//	Path Write
 		//=====================================================================
 

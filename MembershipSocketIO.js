@@ -299,6 +299,49 @@ Membership.OnConnection =
 
 
 		//=====================================================================
+		//	Path Read All
+		//=====================================================================
+
+		Socket.on('Membership.PathReadAll',
+			function(Request) {
+				try {
+					if (Logger) { Logger.LogTrace('Processing [Membership.PathReadAll] ... '); }
+					if (!Socket.MemberName) { throw ERR_AuthenticationRequired; }
+					if (!Socket.SessionID) { throw ERR_SessionRequired; }
+					if (Socket.SessionID != Request.control.session_id) { throw ERR_InvalidSession; }
+					var using_member = Socket.MemberName;
+					if (Request.use_shared_folder) { using_member = Membership.SharedFolderName; }
+					var result = Membership.PathList(using_member, Request.path, false);
+					if (result) {
+						var items = [];
+						result.items.forEach(
+							function(item, index) {
+								var filename = Request.path;
+								if (filename) { filename += '/'; }
+								filename += item;
+								var file = Membership.PathRead(using_member, item);
+								items.push(file.content);
+							}
+						);
+						Socket.emit('Membership.PathReadAll.' + Request.control.transaction_id, null, {
+							control: {
+								transaction_id: Request.control.transaction_id,
+								session_id: Request.control.session_id,
+							},
+							path: result.path,
+							items: items
+						});
+					}
+					else {
+						report_error('PathReadAll failed.', 'Membership.PathReadAll', Request.control.transaction_id);
+					}
+					return;
+				}
+				catch (err) { report_error(err, 'Membership.PathReadAll', Request.control.transaction_id); }
+			});
+
+
+		//=====================================================================
 		//	Path Write
 		//=====================================================================
 
