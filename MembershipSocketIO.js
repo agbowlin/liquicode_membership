@@ -319,7 +319,7 @@ Membership.OnConnection =
 								var filename = Request.path;
 								if (filename) { filename += '/'; }
 								filename += item;
-								var file = Membership.PathRead(using_member, item);
+								var file = Membership.PathRead(using_member, filename);
 								items.push(file.content);
 							}
 						);
